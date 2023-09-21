@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <title>reveal.js</title>
+
+    <link rel="stylesheet" href="dist/reset.css" />
+    <link rel="stylesheet" href="dist/reveal.css" />
+    <link rel="stylesheet" href="dist/theme/black.css" />
+
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="plugin/highlight/github-dark.css" />
+    <style>
+      :root {
+        --r-heading2-size: 1.2em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- Introduction -->
+        <section>
+          <h2>Quand React confond<br>client et serveur</h2>
+          <p>
+            Présentation des nouvautés apportées par React 18 côté
+            serveur
+          </p>
+          <hr />
+          <p>
+            <small>Par Gérald Gounot</small>
+          </p>
+        </section>
+        <section>
+          <h2>Qui suis-je ?</h2>
+          <p class="fragment fade-left">Gérald Gounot</p>
+          <p class="fragment fade-left">
+            Développeur full-stack
+            <span class="fragment fade-left">freelance</span>
+          </p>
+          <p class="fragment fade-left">
+            Spécialisé JavaScript, TypeScript, React
+          </p>
+        </section>
+        <section>
+          <h2>Objectif de la présentation</h2>
+          <p class="fragment fade-left">
+            Comprendre les nouvelles fonctionnalités apportées par React 18
+          </p>
+          <p class="fragment fade-left">
+            Notamment : <span class="fragment fade-left">SSR, </span
+            ><span class="fragment fade-left">Suspense, </span
+            ><span class="fragment fade-left">Server Components, </span
+            ><span class="fragment fade-left">Server Actions</span>
+          </p>
+        </section>
+        <section>
+          <section>
+            <h2>Sommaire</h2>
+            <p>3 parties</p>
+          </section>
+          <section>
+            <h3>I. Server Side Rendering</h3>
+            <ol>
+              <li class="fragment fade-left">SPA</li>
+              <li class="fragment fade-left">SSR</li>
+              <li class="fragment fade-left">SSR avec Suspense</li>
+            </ol>
+          </section>
+          <section>
+            <h3>II. Server Components</h3>
+            <ol>
+              <li class="fragment fade-left">
+                Server Component vs Client Component
+              </li>
+              <li class="fragment fade-left">Avantages</li>
+              <li class="fragment fade-left">Limitations</li>
+              <li class="fragment fade-left">Quand les utiliser</li>
+            </ol>
+          </section>
+          <section>
+            <h3>III. Server Actions</h3>
+            <ol>
+              <li class="fragment fade-left">Présentation</li>
+              <li class="fragment fade-left">Avantages</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- Server Side Rendering -->
+        <section>
+          <h2>Single Page App (SPA)</h2>
+          <img src="images/SPA.png" />
+        </section>
+
+        <section>
+          <section>
+            <h2>Server Side Rendering (SSR)</h2>
+            <p>(sans données)</p>
+            <img src="images/SSR1.png" />
+          </section>
+          <section>
+            <h2>Server Side Rendering (SSR)</h2>
+            <p>(avec données)</p>
+            <img src="images/SSR2.png" />
+          </section>
+        </section>
+
+        <section>
+          <h2>Suspense</h2>
+          <p class="fragment fade-left">
+            Solution tout en un pour les composants lents
+          </p>
+          <pre
+            class="fragment fade-left"
+          ><code data-trim><script type="text/template">
+            <Suspense fallback={<Loading />}>
+              <SlowComponent />
+            </Suspense>
+          </script></code></pre>
+          <span class="fragment fade-left">Fallback </span>
+          <span class="fragment fade-left"> → Streaming </span>
+          <span class="fragment fade-left"> → Hydratation sélective</span>
+        </section>
+
+        <section>
+          <h2>Utilisation de Suspense</h2>
+          <pre><code data-trim data-line-numbers="4,8,11|3,5,7,9,10,12|2,3,7,10|2,3,8,10|2,4,8,10|2,4,8,11"><script type="text/template">
+            <Layout>
+              <NavBar />
+              <Suspense fallback={<SideBarSkeleton />}>
+                <SideBar />
+              </Suspense>
+              <Content>
+                <Suspense fallback={<PostSkeleton />}>
+                  <Post />
+                </Suspense>
+                <Suspense fallback={<CommentsSkeleton />}>
+                  <Comments />
+                </Suspense>
+              </Content>
+            </Layout>
+          </script></code></pre>
+        </section>
+
+        <section>
+          <h2>SSR avec Suspense</h2>
+          <img src="images/ConcurrentSSR.png" />
+        </section>
+
+        <!-- Server Components -->
+        <section>
+          <section>
+          <h2>Server Components</h2>
+          <p class="fragment fade-left">
+            (différence avec les Client Components)
+          </p>
+          <table>
+            <tr class="fragment fade-left">
+              <th>Client Comp.</th>
+              <td>
+                </span
+            ><span class="fragment fade-left">rendu sur le client </span
+            ><span class="fragment fade-left">ou sur le serveur</span>
+              </td>
+            </tr>
+            <tr class="fragment fade-left">
+              <th>Server Comp.</th>
+              <td>
+                <span class="fragment fade-left">rendu sur le serveur </span>
+            <span class="fragment fade-left"
+              ><strong style="color: #1b91ff">uniquement</strong></span
+            >
+              </td>
+            </tr>
+          </table>
+        </section>
+        <section>
+          <p style="text-align: left">Par défaut : Server Component</p>
+          <p style="text-align: left" class="fragment fade-up">Client Component marqué par <code>'use client'</code> en début de fichier</p>
+          <pre
+            class="fragment fade-up"
+          ><code class="javascript" data-trim><script type="text/template">
+            'use client'
+            
+            function MyClientComponent() {
+              return (
+                <OtherClientComponent />
+              );
+            }
+          </script></code></pre>
+        </section>
+        </section>
+        <section>
+          <h2>Implications</h2>
+          <ul>
+            <li class="fragment fade-left">
+              Statique :
+              <span class="fragment fade-in"
+                >pas de useState, useContext, useEffet, etc.</span
+              >
+            </li>
+            <li class="fragment fade-left">
+              Ne peut utiliser l'API du navigateur (window, localStorage, etc.)
+            </li>
+            <li class="fragment fade-left">
+              Contexte serveur :
+              <span class="fragment fade-left"
+                >accès direct à la base de données</span
+              >
+            </li>
+            <li class="fragment fade-left">
+              Aucun JavaScript envoyé au navigateur
+            </li>
+          </ul>
+        </section>
+        <section>
+          <h2>Exemple de server Component</h2>
+          <pre><code data-trim data-line-numbers="1-10|1|2|4-9|1-10"><script type="text/template">
+            async function BlogPost({ id }) {
+              const blogPost = await db.blogPosts.get(id);
+              
+              return (
+                <article>
+                  <h1>{blogPost.title}</h1>
+                  <div>{blogPost.content}</div>
+                </article>
+              );
+            }
+          </script></code></pre>
+        </section>
+        <section>
+          <h2>Quand les utiliser</h2>
+          <table>
+            <tr class="fragment fade-left">
+              <th>Server Components</th>
+              <td>
+                <span class="fragment fade-left">éléments statiques, </span
+                ><span class="fragment fade-left">données</span>
+              </td>
+            </tr>
+            <tr class="fragment fade-left">
+              <th>Client Components</th>
+              <td>
+                <span class="fragment fade-left">éléments interactifs</span>
+              </td>
+            </tr>
+          </table>
+        </section>
+        <section>
+          <img src="images/ComponentLayout.png" />
+        </section>
+        <section>
+          <p>Un composant non marqué par <code>'use client'</code> est du type de son parent</p>
+          <p class="fragment fade-left"><code>'use client'</code> marque la frontière entre serveur et client</p>
+        </section>
+        <section>
+          <p>
+            Les Server Components peuvent importer tout type de composant
+          </p>
+          <p class="fragment fade-left">
+            Les Server Components ne peuvent pas être importés par des Client
+            Components
+          </p>
+          <p class="fragment fade-left">
+            Mais ils peuvent être passés en props
+          </p>
+          <pre class="fragment fade-up"><code class="javascript" data-trim><script type="text/template">
+            <ClientComponent>
+              <ServerComponent />
+            </ClientComponent>
+          </script></code></pre>
+          <pre class="fragment fade-up"><code class="javascript" data-trim><script type="text/template">
+            <ClientComponent servComp={<ServerComponent />}>
+          </script></code></pre>
+        </section>
+        <section>
+          <img src="images/ComponentTree.png" />
+        </section>
+        <section>
+          <h2>Et les mutations dans tout ça ?</h2>
+          <p class="fragment fade-left">
+            Comme avant : requête sur une route API
+          </p>
+          <pre
+            class="fragment fade-up"
+          ><code data-trim data-line-numbers="8-12|8|2-5|1-14"><script type="text/template">
+            function PostForm() {
+              const handleSubmit = (event) => {
+                event.preventDefault();
+                fetch(...)
+              }
+              
+              return (
+                <form onSubmit={handleSubmit}>
+                  <input name="title" />
+                  <textarea name="content" />
+                  <button>Submit</button>
+                </form>
+              );
+            }
+          </script></code></pre>
+        </section>
+        <section><p>La barrière client-serveur est toujours là...</p></section>
+
+        <!-- Server Actions -->
+        <section>
+          <h2>Server Actions</h2>
+          <p class="fragment fade-left">Équivalent du Server Component pour les mutations</p>
+          <p class="fragment fade-left">Fonction serveur appelée depuis le client</p>
+        </section>
+        <section>
+          <h2>Server Action</h2>
+          <p>Contexte : Server Component</p>
+          <pre
+            class="fragment fade-up"
+          ><code data-trim data-line-numbers="1,7-14|2,5|3|4|2-5|8|1-14"><script type="text/template">
+            function PostForm() {
+              async const createPost = (formData) => {
+                'use server'
+                await db.blogPosts.create(formData)
+              }
+              
+              return (
+                <form action={createPost}>
+                  <input name="title" />
+                  <textarea name="content" />
+                  <button>Submit</button>
+                </form>
+              );
+            }
+          </script></code></pre>
+        </section>
+        <section>
+          <h2>Server Action</h2>
+          <p>Contexte : Client Component ou Server Component</p>
+          <pre
+            class="fragment fade-left"
+          ><code data-trim data-line-numbers="1|3-5|1-5"><script type="text/template">
+            'use server'
+
+            export async function createPost(formData) {
+              await db.blogPosts.create(formData)
+            }
+          </script></code></pre>
+          <pre
+            class="fragment fade-left"
+          ><code data-trim data-line-numbers="1-13|3|7|1-13"><script type="text/template">
+            'use client'
+
+            import { createPost } from './actions'
+
+            function PostForm() {
+              return (
+                <form action={createPost}>
+                  <input name="title" />
+                  <textarea name="content" />
+                  <button>Submit</button>
+                </form>
+              );
+            }
+          </script></code></pre>
+        </section>
+        <section>
+          <h2>Avantages</h2>
+          <ul>
+            <li class="fragment fade-left">
+              Même DX qu'avec les Server Components
+            </li>
+            <li class="fragment fade-left">
+              Fonctionne avec les Server et les Client Components
+            </li>
+            <li class="fragment fade-left">Type safe</li>
+            <li class="fragment fade-left">Fonctionne sans JavaScript</li>
+          </ul>
+        </section>
+
+        <!-- Conclusion -->
+        <section>
+          <h2>Conclusion</h2>
+          <ul>
+            <li class="fragment fade-left">
+              UX améliorée :
+              <span class="fragment fade-left">app plus légère et rapide</span>
+            </li>
+            <li class="fragment fade-left">
+              DX améliorée :
+              <span class="fragment fade-left"
+                >barrière client-serveur réduite au minimum</span
+              >
+            </li>
+            <li class="fragment fade-left">
+              Ce nouveau paradigme va encore évoluer
+            </li>
+          </ul>
+        </section>
+        <section>
+          <h2>Merci pour votre attention !</h2>
+          <p>Des questions ?</p>
+        </section>
+        <section>
+          <p>Meetup JavaScript prévu le 17 octobre à la Mêlée !</p>
+          <hr />
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="display: flex; align-items: center; gap: 0.6em"><img style="width: 1.6em" src="images/linkedin.png"> /in/ggounot</span>
+            gerald@gounot.eu
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script>
+      // More info about initialization & config:
+      // - https://revealjs.com/initialization/
+      // - https://revealjs.com/config/
+      Reveal.initialize({
+        hash: true,
+
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [RevealHighlight],
+      });
+    </script>
+  </body>
+</html>
